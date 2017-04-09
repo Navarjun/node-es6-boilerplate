@@ -10,6 +10,10 @@ const srcFolder = "src/";
 const files = ["index.js"];
 const tasks = [];
 
+function handleError(err) {
+  console.log(err.toString());
+  this.emit('end');
+}
 
 for (let i = 0; i < files.length; i++) {
   const webpackConfig = {
@@ -28,10 +32,12 @@ for (let i = 0; i < files.length; i++) {
     return watch(srcFolder+"*", function() {
       gulp.src(srcFolder+files[i])
         .pipe(webpackStream(webpackConfig))
+        .on('error', handleError)
         .pipe(rename(files[i], { extension: ".js" }))
         .pipe(gulp.dest('build'))
         .pipe(rename({suffix: ".min"}))
         .pipe(uglify()) // minifies and uglifies the file
+        .on('error', handleError)
         .pipe(gulp.dest('build'));
     });
   });
